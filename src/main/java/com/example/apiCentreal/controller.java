@@ -9,6 +9,7 @@ import com.example.apiCentreal.rogers.service.WebScraperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -22,6 +23,9 @@ public class controller {
     private PlanService service;
 
     @Autowired
+    private centralservice centralservice;
+
+    @Autowired
     private WebScraperService webScraperService;
 
     @Autowired
@@ -33,16 +37,20 @@ public class controller {
       System.out.println("welcome");
     }
     @GetMapping(path = "/fidoplans")
-     ArrayList<plan> useropt()
+     ArrayList<plan> getFidoPlans()
     {
         return service.getPlans();
     }
 
     @GetMapping("/rogersplans")
-    public List<Plan> getPlans() {
+    public List<Plan> getRogersPlans() {
         return webScraperService.scrapePlans();
     }
 
+    @GetMapping("/ranking")
+    public List<String> getRogersPlans(@RequestParam("keyword") String key) {
+        return centralservice.getRanking(key);
+    }
 
 //    @GetMapping(path = "/device")
 //    ArrayList<device> device()

@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.cache.annotation.Cacheable;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 
@@ -123,21 +124,11 @@ public class PageRanking {
         return sortedPages;
     }
 
+
     @Cacheable(value = "scrapedData", key = "#someKey")
-    public  ArrayList<String> getRanking(String keyword) {
-
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-
+    public ArrayList<String> getRanking(String keyword) throws IOException {
         ArrayList<String> ranklist = new ArrayList<>();
-
-//        Scanner sc = new Scanner(System.in);
-//
-//        System.out.println("How many keyword you want to search?");
-//        int n = sc.nextInt();
-//        // Set up Selenium WebDriver
-
-        // Web pages to scrape
+        Map<String, String> pageContents = new HashMap<>();
         String[] urls = {
                 "https://www.fido.ca/phones/bring-your-own-device?icid=F_WIR_CNV_GRM6LG&flowType=byod",
                 "https://www.rogers.com/plans?icid=R_WIR_CMH_6WMCMZ",
@@ -145,46 +136,50 @@ public class PageRanking {
                 "https://www.telus.com/en/mobility/plans"
         };
 
-        Map<String, String> pageContents = new HashMap<>();
-         // Define the keyword to search for
+        String[] filenames = {
+                "fido.txt","rogers.txt","virgin.txt","telus.txt"
+        };
 
-
-
-
-            WebDriverManager.chromedriver().setup(); // Replace with your WebDriver path
-
-            WebDriver driver = new ChromeDriver(options);
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        WebDriverManager.chromedriver().setup();
+        WebDriver driver = new ChromeDriver();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         try {
-            // Iterate over URLs and scrape text content
+            // Loop through each URL
+
+            int i = 0;
             for (String url : urls) {
-                driver.get(url);
+                String fileName = filenames[i];
+                String content = FileUtil.loadPageFromFile(url, fileName);  // Check if data is cached in a file
 
-                // Scrape the content from a specific element (e.g., body, article, div)
-                WebElement contentElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("body"))); // Adjust the selector as needed
-                String content = contentElement.getText().toLowerCase();
+                // If content is not cached, perform scraping
+                if (content == null) {
+                    driver.get(url);
+                    WebElement contentElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("body")));
+                    content = contentElement.getText().toLowerCase();
+                    FileUtil.savePageToFile(url, content, fileName);  // Save the scraped data
 
-                // Store the page content with the page URL as key
-                pageContents.put(url, content);
-            }
 
-            // Rank pages based on keyword frequency
-            List<Map.Entry<String, Integer>> rankedPages = rankPages(pageContents, keyword);
+                }
 
-            // Display ranked pages
-            System.out.println("\nPages ranked by keyword frequency:");
-            for (Map.Entry<String, Integer> entry : rankedPages) {
-                System.out.println(entry.getKey() + ": " + entry.getValue() + " occurrences");
-                ranklist.add(entry.getKey() + ": " + entry.getValue() + " occurrences");
+                pageContents.put(url, content);  // Add content to the map for ranking
+
+                i++;
             }
         } finally {
-            // Close the WebDriver
+
             driver.quit();
         }
 
-        return  ranklist;
-    }
+        // Rank pages based on keyword frequency
+        List<Map.Entry<String, Integer>> rankedPages = rankPages(pageContents, keyword);
 
+        for (Map.Entry<String, Integer> entry : rankedPages) {
+            System.out.println(entry.getKey() + ": " + entry.getValue() + " occurrences");
+            ranklist.add(entry.getKey() + ": " + entry.getValue() + " occurrences");
+        }
+
+        return ranklist;
+    }
 }
 

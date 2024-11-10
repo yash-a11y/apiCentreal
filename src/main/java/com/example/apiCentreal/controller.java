@@ -6,6 +6,8 @@ import com.example.apiCentreal.fido.API.PlanService;
 import com.example.apiCentreal.fido.API.obj.plan;
 import com.example.apiCentreal.rogers.models.Plan;
 import com.example.apiCentreal.rogers.service.WebScraperService;
+import com.example.apiCentreal.tellus.model.TelusPlan;
+import com.example.apiCentreal.tellus.service.PlanScrapingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +32,8 @@ public class controller {
 
     @Autowired
     private com.example.apiCentreal.fido.API.deviceSrv deviceSrv;
+    @Autowired
+    private PlanScrapingService planScrapingService;
 
     @GetMapping("/home")
     void welcome()
@@ -51,6 +55,15 @@ public class controller {
     public List<String> getRogersPlans(@RequestParam("keyword") String key) {
         return centralservice.getRanking(key);
     }
+    
+    @GetMapping("/telusplans")
+    public List<TelusPlan> getTelusPlans() {
+        return  planScrapingService.scrapeTelusPlans();
+    }
+       
+    
+
+
 
 //    @GetMapping(path = "/device")
 //    ArrayList<device> device()

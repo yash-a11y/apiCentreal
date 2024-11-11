@@ -44,20 +44,20 @@ public class Plan {
         ArrayList<plan> plansArr = new ArrayList<plan>();
 
         List<String> planDetail = new ArrayList<>();
-        planDetail.add("Voicemail (up to 3 messages)2\n" +
-                "Unlimited incoming text, picture and video messaging in Canada3\n" +
-                "Call Display with Name Display\n" +
-                "4G LTE network speeds so you can call, text, or stream with coverage that keeps up with you4\n" +
-                "Plan features not available with Tablet Data-only Plans");
+        planDetail.add("Voicemail (up to 3 messages)2," +
+                " Unlimited incoming text, picture and video messaging in Canada3." +
+                " Call Display with Name Display." +
+                " 4G LTE network speeds so you can call, text, or stream with coverage that keeps up with you4." +
+                " Plan features not available with Tablet Data-only Plans.");
 
-        planDetail.add("Voicemail (up to 3 messages)2\n" +
-                "Unlimited incoming text, picture and video messaging in Canada3\n" +
-                "Call Display with Name Display");
-        planDetail.add("3G network speeds for light browsing and for standard definition video quality when streaming9\n" +
-                "Voicemail (up to 3 messages)2\n" +
-                "Unlimited incoming text, picture and video messaging in Canada3\n" +
-                "Call Display\n" +
-                "You must Bring Your Own Phone to use Fido Basic plans.");
+        planDetail.add("Voicemail (up to 3 messages)2." +
+                " Unlimited incoming text, picture and video messaging in Canada3." +
+                " Call Display with Name Display.");
+        planDetail.add("3G network speeds for light browsing and for standard definition video quality when streaming9." +
+                " Voicemail (up to 3 messages)2." +
+                " Unlimited incoming text, picture and video messaging in Canada3." +
+                " Call Display." +
+                " You must Bring Your Own Phone to use Fido Basic plans.");
 
 
         try {

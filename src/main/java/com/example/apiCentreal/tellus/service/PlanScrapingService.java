@@ -57,7 +57,7 @@ public class PlanScrapingService {
             Thread.sleep(500); // Add a short delay to allow scrolling to complete
 
             plansLink.click();
-            Thread.sleep(500);Thread.sleep(500);Thread.sleep(500);
+            Thread.sleep(5000);
             // Retrieve plan elements
             List<WebElement> planElements = driver.findElements(By.className("component_planPadding__s746_"));
             for (WebElement planElement : planElements) {

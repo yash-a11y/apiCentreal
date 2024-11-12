@@ -124,7 +124,9 @@ public class Plan {
 
                     String name = pElement.getText();
                     String priceStr = price.getText();
-                    System.out.print("Plan detail : "+ detail);
+                    System.out.println("Plan name : "+name);
+                    System.out.println("Plan price : "+priceStr);
+                    System.out.println("Plan detail : "+ detail);
 
                     finalPlans.add(new plan(name,priceStr,detail));
 

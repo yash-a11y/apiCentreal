@@ -1,9 +1,7 @@
 package com.example.apiCentreal.pageRanking;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -140,9 +138,12 @@ public class PageRanking {
                 "fido.txt","rogers.txt","virgin.txt","telus.txt"
         };
 
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+
         WebDriverManager.chromedriver().setup();
-        WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
         try {
             // Loop through each URL
@@ -155,8 +156,26 @@ public class PageRanking {
                 // If content is not cached, perform scraping
                 if (content == null) {
                     driver.get(url);
-                    WebElement contentElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("body")));
-                    content = contentElement.getText().toLowerCase();
+
+
+                    int retryCount = 3;
+                    while (retryCount > 0) {
+                        try {
+                            WebElement contentElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("body")));
+                            content = contentElement.getText().toLowerCase();
+                            break;
+                        } catch (TimeoutException e) {
+                            retryCount--;
+                            if (retryCount == 0) throw e; // Rethrow if all retries fail
+                            try {
+                                Thread.sleep(1000); // Delay between retries
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    }
+
+
                     FileUtil.savePageToFile(url, content, fileName);  // Save the scraped data
 
 

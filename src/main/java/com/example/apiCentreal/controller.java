@@ -8,6 +8,7 @@ import com.example.apiCentreal.rogers.models.Plan;
 import com.example.apiCentreal.rogers.service.WebScraperService;
 import com.example.apiCentreal.tellus.model.TelusPlan;
 import com.example.apiCentreal.tellus.service.PlanScrapingService;
+import com.example.apiCentreal.virgin.service.PlanScraperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "plans/api/v.1")
@@ -60,7 +62,11 @@ public class controller {
     public List<TelusPlan> getTelusPlans() {
         return  planScrapingService.scrapeTelusPlans();
     }
-       
+
+    @GetMapping("/virginplans")
+    public  List<Map<String,String>> scrapePlans() throws InterruptedException{
+        return PlanScraperService.scrapePlans();
+    }
     
 
 

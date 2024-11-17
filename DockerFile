@@ -1,0 +1,23 @@
+# Use an official Java runtime as a parent image
+FROM eclipse-temurin:17-jdk-alpine
+
+# Install bash and curl (useful for debugging or other commands)
+RUN apk add --no-cache bash curl
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the local code to the container
+COPY . .
+
+# Ensure that the Maven wrapper script is executable
+RUN chmod +x mvnw
+
+# Run the Maven build using the wrapper (this will download and install dependencies)
+RUN ./mvnw clean install -DskipTests
+
+# Expose the port the app runs on (default for Spring Boot is 8080)
+EXPOSE 8080
+
+# Run the application using Java
+CMD ["java", "-jar", "target/apiCentreal.jar"]

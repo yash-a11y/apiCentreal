@@ -57,9 +57,9 @@ public class PlanScraperService {
                 }
 
                 // Store the extracted data
-                planData.put("planName", planName);
+                planData.put("planname", planName);
                 planData.put("details", details.toString());
-                planData.put("price", numericPrice);
+                planData.put("planprice", numericPrice);
 
                 plansList.add(planData);
             }

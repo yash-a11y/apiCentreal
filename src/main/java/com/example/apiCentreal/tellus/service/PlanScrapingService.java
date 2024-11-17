@@ -33,7 +33,7 @@ public class PlanScrapingService {
             driver.get("https://www.telus.com/en");
             driver.manage().window().maximize();
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
             // Wait for the cookie banner and close it if present
             try {
@@ -49,7 +49,7 @@ public class PlanScrapingService {
 
 
 
-            WebElement plansLink = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#\\32 BbaY5q5pcNDHnTG33q3eyZm5CgUTsycaGQMEwUgYI4")));
+            WebElement plansLink = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#header-container > div.sc-bkSUFG.ijBOGQ > div > div > nav.sc-dExYaf.kIlYBJ > ul > li:nth-child(1) > div > div > div > div > nav > div:nth-child(1) > nav > ul > li:nth-child(3) > a")));
 
             // Scroll to the element using JavaScript Executor
             JavascriptExecutor js = (JavascriptExecutor) driver;

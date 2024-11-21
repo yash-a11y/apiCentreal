@@ -1,26 +1,35 @@
 package com.example.apiCentreal.pageRanking;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FileUtil {
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
-    // Save each page content to a separate file
-    public static void savePageToFile(String url, String content,String fileName) throws IOException {
-
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName))) {
-            writer.write(content);
+    public static String loadPageFromFile(String url, String fileName) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+            return content.toString();
+        } catch (IOException e) {
+            logger.error("Error loading file {}: {}", fileName, e.getMessage());
+            return null;
         }
     }
 
-    // Load page content from a file, return null if the file does not exist
-    public static String loadPageFromFile(String url,String fileName) throws IOException {
-
-        if (!Files.exists(Paths.get(fileName))) return null;
-
-        return new String(Files.readAllBytes(Paths.get(fileName)));
+    public static void savePageToFile(String url, String content, String fileName) {
+        try (FileWriter writer = new FileWriter(fileName)) {
+            writer.write(content);
+        } catch (IOException e) {
+            logger.error("Error saving file {}: {}", fileName, e.getMessage());
+        }
     }
-
-   }
+}

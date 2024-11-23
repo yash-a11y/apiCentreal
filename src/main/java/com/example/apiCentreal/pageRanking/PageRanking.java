@@ -154,31 +154,64 @@ public class PageRanking {
                 String content = FileUtil.loadPageFromFile(url, fileName);  // Check if data is cached in a file
 
                 // If content is not cached, perform scraping
-                if (content == null) {
-                    driver.get(url);
+                if(url == urls[1]){
+
+                    if (content == null) {
+                        driver.get(url);
 
 
-                    int retryCount = 3;
-                    while (retryCount > 0) {
-                        try {
-                            WebElement contentElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("body")));
-                            content = contentElement.getText().toLowerCase();
-                            break;
-                        } catch (TimeoutException e) {
-                            retryCount--;
-                            if (retryCount == 0) throw e; // Rethrow if all retries fail
+                        int retryCount = 3;
+                        while (retryCount > 0) {
                             try {
-                                Thread.sleep(1000); // Delay between retries
-                            } catch (InterruptedException ex) {
-                                throw new RuntimeException(ex);
+                                wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ds-tabs-0-tabPanel-0")));
+                                WebElement contentElement = driver.findElement(By.tagName("body"));
+
+                                content = contentElement.getText().toLowerCase();
+                                break;
+                            } catch (TimeoutException e) {
+                                retryCount--;
+                                if (retryCount == 0) throw e; // Rethrow if all retries fail
+                                try {
+                                    Thread.sleep(1000); // Delay between retries
+                                } catch (InterruptedException ex) {
+                                    throw new RuntimeException(ex);
+                                }
                             }
                         }
+
+
+                        FileUtil.savePageToFile(url, content, fileName);  // Save the scraped data
+
+
                     }
 
+                }else {
+                    if (content == null) {
+                        driver.get(url);
 
-                    FileUtil.savePageToFile(url, content, fileName);  // Save the scraped data
+
+                        int retryCount = 3;
+                        while (retryCount > 0) {
+                            try {
+                                WebElement contentElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("body")));
+                                content = contentElement.getText().toLowerCase();
+                                break;
+                            } catch (TimeoutException e) {
+                                retryCount--;
+                                if (retryCount == 0) throw e; // Rethrow if all retries fail
+                                try {
+                                    Thread.sleep(1000); // Delay between retries
+                                } catch (InterruptedException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            }
+                        }
 
 
+                        FileUtil.savePageToFile(url, content, fileName);  // Save the scraped data
+
+
+                    }
                 }
 
                 pageContents.put(url, content);  // Add content to the map for ranking

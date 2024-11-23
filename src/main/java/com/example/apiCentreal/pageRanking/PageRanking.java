@@ -194,8 +194,8 @@ public class PageRanking {
         List<Map.Entry<String, Integer>> rankedPages = rankPages(pageContents, keyword);
 
         for (Map.Entry<String, Integer> entry : rankedPages) {
-            System.out.println(entry.getKey() + ": " + entry.getValue() + " occurrences");
-            ranklist.add(entry.getKey() + ": " + entry.getValue() + " occurrences");
+            System.out.println(entry.getKey() + "," + entry.getValue());
+            ranklist.add(entry.getKey() + "," + entry.getValue());
         }
 
         return ranklist;

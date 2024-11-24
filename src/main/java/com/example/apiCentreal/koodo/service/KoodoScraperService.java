@@ -1,6 +1,5 @@
 package com.example.apiCentreal.koodo.service;
 
-
 import com.example.apiCentreal.koodo.model.KoodoPlan;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -20,16 +20,27 @@ public class KoodoScraperService {
 
     private WebDriver driver;
 
-    public KoodoScraperService() {
-        // Set the path to your ChromeDriver
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");  // Enable headless mode
-        options.addArguments("--window-size=1920,1080");  // Set a window size for consistent rendering
-        this.driver = new ChromeDriver(options);
+    // Initialize the WebDriver
+    private void initializeDriver() {
+        if (driver == null) {
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--headless");
+            options.addArguments("--window-size=1920,1080");
+            this.driver = new ChromeDriver(options);
+        }
+    }
+
+    // Shutdown WebDriver
+    public void shutdownDriver() {
+        if (driver != null) {
+            driver.quit();
+            driver = null; // Nullify to allow reinitialization
+        }
     }
 
     public List<KoodoPlan> scrapePrepaidPlans() {
         List<KoodoPlan> plans = new ArrayList<>();
+        initializeDriver(); // Ensure driver is initialized
 
         try {
             // Navigate to the Koodo Mobile prepaid plans page
@@ -43,7 +54,6 @@ public class KoodoScraperService {
             List<WebElement> tabs = driver.findElements(By.cssSelector(".KDS_Tabs-modules__tabButton___1RuCu"));
             for (WebElement tab : tabs) {
                 String planType = tab.getText();
-                System.out.println("Extracting plans for: " + planType);
 
                 // Click on the tab to load its content
                 tab.click();
@@ -67,15 +77,11 @@ public class KoodoScraperService {
                         break;
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            // Close the browser
-            driver.quit();
         }
 
-        return plans;
+        return plans; // Do not quit driver here to allow reuse
     }
 
     private List<KoodoPlan> extract4GBasePlans(String planType) {
@@ -83,25 +89,14 @@ public class KoodoScraperService {
 
         List<WebElement> planCards = driver.findElements(By.cssSelector(".KDS_Item-modules__item___1fILq"));
         for (WebElement planCard : planCards) {
-            String planDetails = planCard.findElements(By.cssSelector(".KDS_Item-modules__item__button___In_p4"))
-                    .get(0).findElement(By.cssSelector(".KDS_Item-modules__item__wrapper--hover___10TpD"))
-                    .findElement(By.cssSelector(".KDS_Item-modules__item__highlights___3blvQ"))
-                    .findElement(By.cssSelector(".KDS_Item-modules__children__wrapper___3a1Xn")).getText();
+            String planDetails = planCard.findElement(By.cssSelector(".KDS_Item-modules__children__wrapper___3a1Xn")).getText();
 
             String[] lines = planDetails.split("\n");
-            String price = lines[1] + lines[2]; // Combine parts for price
+            String price = lines[1] ;
             String validity = lines[3];
-            StringBuilder detailsBuilder = new StringBuilder();
-            for (int i = 4; i < lines.length; i++) {
-                if (i > 4) {
-                    detailsBuilder.append(", "); // Add a comma before appending further details
-                }
-                detailsBuilder.append(lines[i]);
-            }
-            String details = detailsBuilder.toString();
+            String details = String.join(", ", List.of(lines).subList(4, lines.length));
 
-            // Add to the list
-            KoodoPlan plan = new KoodoPlan(planType,validity, details,price);
+            KoodoPlan plan = new KoodoPlan(planType, validity, details, price);
             plans.add(plan);
         }
 
@@ -109,33 +104,7 @@ public class KoodoScraperService {
     }
 
     private List<KoodoPlan> extract360DayPlans(String planType) {
-        List<KoodoPlan> plans = new ArrayList<>();
-
-        List<WebElement> planCards = driver.findElements(By.cssSelector(".KDS_Item-modules__item___1fILq"));
-        for (WebElement planCard : planCards) {
-            String planDetails = planCard.findElements(By.cssSelector(".KDS_Item-modules__item__button___In_p4"))
-                    .get(0).findElement(By.cssSelector(".KDS_Item-modules__item__wrapper--hover___10TpD"))
-                    .findElement(By.cssSelector(".KDS_Item-modules__item__highlights___3blvQ"))
-                    .findElement(By.cssSelector(".KDS_Item-modules__children__wrapper___3a1Xn")).getText();
-
-            String[] lines = planDetails.split("\n");
-            String price =  lines[1] + lines[2]; // Combine parts for price
-            String validity = lines[3];
-            StringBuilder detailsBuilder = new StringBuilder();
-            for (int i = 4; i < lines.length; i++) {
-                if (i > 4) {
-                    detailsBuilder.append(", "); // Add a comma before appending further details
-                }
-                detailsBuilder.append(lines[i]);
-            }
-            String details = detailsBuilder.toString();
-
-            // Add to the list
-            KoodoPlan plan = new KoodoPlan(planType,validity, details,price);
-            plans.add(plan);
-        }
-
-        return plans;
+        return extract4GBasePlans(planType); // Logic is the same, reuse the method
     }
 
     private List<KoodoPlan> extractBoosterAddons(String planType) {
@@ -143,20 +112,31 @@ public class KoodoScraperService {
 
         List<WebElement> planCards = driver.findElements(By.cssSelector(".KDS_Item-modules__item___1fILq"));
         for (WebElement planCard : planCards) {
-            String planDetails = planCard.findElements(By.cssSelector(".KDS_Item-modules__item__button___In_p4"))
-                    .get(0).findElement(By.cssSelector(".KDS_Item-modules__item__wrapper--hover___10TpD"))
-                    .findElement(By.cssSelector(".KDS_Item-modules__item__highlights___3blvQ"))
-                    .findElement(By.cssSelector(".KDS_Item-modules__children__wrapper___3a1Xn")).getText();
-            String[] lines = planDetails.split("\n");
-            String price = lines[1]; // Combine parts for price
-            String validity = "NA";
-            String details = lines[2];
+            String planDetails = planCard.findElement(By.cssSelector(".KDS_Item-modules__children__wrapper___3a1Xn")).getText();
 
-            // Add to the list
-            KoodoPlan plan = new KoodoPlan(planType,validity, details,price);
+            // Split the details into lines
+            String[] lines = planDetails.split("\n");
+
+            // Debugging: Print the plan details and the resulting lines
+            System.out.println("Plan Details: " + planDetails);
+            System.out.println("Lines: " + Arrays.toString(lines));
+
+            // Validate array length to avoid ArrayIndexOutOfBoundsException
+            if (lines.length < 2) {
+                System.out.println("Unexpected plan format: " + planDetails);
+                continue; // Skip this card if the format is not as expected
+            }
+
+            // Safely extract fields
+            String price = lines[1];
+            String details = (lines.length > 2) ? lines[2] : "Details not available";
+
+            // Create a KoodoPlan object and add it to the list
+            KoodoPlan plan = new KoodoPlan(planType, "NA", details, price);
             plans.add(plan);
         }
 
         return plans;
     }
+
 }

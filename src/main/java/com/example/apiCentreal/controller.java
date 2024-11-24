@@ -4,6 +4,8 @@ package com.example.apiCentreal;
 
 import com.example.apiCentreal.fido.API.PlanService;
 import com.example.apiCentreal.fido.API.obj.plan;
+import com.example.apiCentreal.koodo.model.KoodoPlan;
+import com.example.apiCentreal.koodo.service.KoodoScraperService;
 import com.example.apiCentreal.rogers.models.Plan;
 import com.example.apiCentreal.rogers.service.WebScraperService;
 import com.example.apiCentreal.tellus.model.TelusPlan;
@@ -37,6 +39,9 @@ public class controller {
     @Autowired
     private PlanScrapingService planScrapingService;
 
+    @Autowired
+    private  KoodoScraperService koodoScraperService;
+
     @GetMapping("/home")
     void welcome()
     {
@@ -66,6 +71,11 @@ public class controller {
     @GetMapping("/virginplans")
     public  List<Map<String,String>> scrapePlans() throws InterruptedException{
         return PlanScraperService.scrapePlans();
+    }
+
+    @GetMapping("/koodoplans")
+    public List<KoodoPlan> getKoodoPlans() {
+        return koodoScraperService.scrapePrepaidPlans();
     }
     
 

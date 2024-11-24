@@ -4,6 +4,8 @@ package com.example.apiCentreal;
 
 import com.example.apiCentreal.fido.API.PlanService;
 import com.example.apiCentreal.fido.API.obj.plan;
+import com.example.apiCentreal.koodo.KoodoPlan;
+import com.example.apiCentreal.koodo.KoodoScraperService;
 import com.example.apiCentreal.rogers.models.Plan;
 import com.example.apiCentreal.rogers.service.WebScraperService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "plans/api/v.1")
@@ -30,6 +33,8 @@ public class controller {
 
     @Autowired
     private com.example.apiCentreal.fido.API.deviceSrv deviceSrv;
+    @Autowired
+    private  KoodoScraperService koodoScraperService;
 
     @GetMapping("/home")
     void welcome()
@@ -51,6 +56,14 @@ public class controller {
     public List<String> getRogersPlans(@RequestParam("keyword") String key) {
         return centralservice.getRanking(key);
     }
+
+
+    @GetMapping("/koodo")
+    public List<KoodoPlan> getKoodoPlans() {
+        return koodoScraperService.scrapePrepaidPlans();
+    }
+
+
 
 //    @GetMapping(path = "/device")
 //    ArrayList<device> device()

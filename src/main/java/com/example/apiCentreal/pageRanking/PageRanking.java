@@ -145,6 +145,8 @@ public class PageRanking {
         WebDriver driver = new ChromeDriver(options);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
+        //exception handling
+        //
         try {
             // Loop through each URL
 

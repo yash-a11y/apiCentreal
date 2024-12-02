@@ -1,7 +1,8 @@
-FROM ubuntu:latest
+#FROM ubuntu:latest
+FROM openjdk:17-jdk-slim
 LABEL authors="yash"
 VOLUME /tmp
-#FROM openjdk:17-jdk-slim
+
 EXPOSE 8080
-COPY apiCentreal/target/*.jar app.jar
+COPY target/*.jar app.jar
 ENTRYPOINT ["java", "-jar","app.jar"]
